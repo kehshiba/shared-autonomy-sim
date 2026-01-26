@@ -11,4 +11,4 @@ from control.teleop import teleop_robot
 if __name__ == "__main__":
     physicsClient , plane_id = create_world()
     robot_id = load_robot()
-    teleop_robot(robot_id)
+    teleop_robot(robot_id,delay=1.0)
