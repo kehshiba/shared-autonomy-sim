@@ -1,2 +1,2 @@
 [MASTER]
-extension-pkg-allow-list=pybullet
+extension-pkg-allow-list=pybullet,pybullet_data,numpy

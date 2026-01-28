@@ -14,28 +14,28 @@ class KalmanTargetTracker:
         # State vector: [x, y, z, vx, vy, vz]
         self.dt = dt
         self.x = np.zeros((6, 1))  # initial state
-        self.P = np.eye(6) * 1.0   # initial covariance
+        self.p_matrix = np.eye(6) * 1.0   # initial covariance  # pylint: disable=invalid-name
 
         # Motion model: constant velocity
-        self.F = np.array([
-            [1,0,0,dt,0,0],
-            [0,1,0,0,dt,0],
-            [0,0,1,0,0,dt],
-            [0,0,0,1,0,0],
-            [0,0,0,0,1,0],
-            [0,0,0,0,0,1]
+        self.f_matrix = np.array([  # pylint: disable=invalid-name
+            [1, 0, 0, dt, 0, 0],
+            [0, 1, 0, 0, dt, 0],
+            [0, 0, 1, 0, 0, dt],
+            [0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 1]
         ])
 
         # Measurement model: we only measure position
-        self.H = np.array([
-            [1,0,0,0,0,0],
-            [0,1,0,0,0,0],
-            [0,0,1,0,0,0]
+        self.h_matrix = np.array([  # pylint: disable=invalid-name
+            [1, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0]
         ])
 
         # Covariances
-        self.Q = np.eye(6) * 0.001  # process noise
-        self.R = np.eye(3) * 0.01   # measurement noise
+        self.q_matrix = np.eye(6) * 0.001  # process noise  # pylint: disable=invalid-name
+        self.r_matrix = np.eye(3) * 0.01   # measurement noise  # pylint: disable=invalid-name
 
     def update(self, measurement):
         """Update state estimate with new position measurement.
@@ -43,19 +43,19 @@ class KalmanTargetTracker:
         Args:
             measurement: Position measurement [x, y, z].
         """
-        z = np.array(measurement).reshape(3,1)
+        z = np.array(measurement).reshape(3, 1)
 
         # Prediction step
-        self.x = self.F @ self.x
-        self.P = self.F @ self.P @ self.F.T + self.Q
+        self.x = self.f_matrix @ self.x
+        self.p_matrix = self.f_matrix @ self.p_matrix @ self.f_matrix.T + self.q_matrix
 
         # Measurement update
-        y = z - self.H @ self.x
-        S = self.H @ self.P @ self.H.T + self.R
-        K = self.P @ self.H.T @ np.linalg.inv(S)
+        y = z - self.h_matrix @ self.x
+        s_matrix = self.h_matrix @ self.p_matrix @ self.h_matrix.T + self.r_matrix  # pylint: disable=invalid-name
+        k_matrix = self.p_matrix @ self.h_matrix.T @ np.linalg.inv(s_matrix)  # pylint: disable=invalid-name
 
-        self.x = self.x + K @ y
-        self.P = (np.eye(6) - K @ self.H) @ self.P
+        self.x = self.x + k_matrix @ y
+        self.p_matrix = (np.eye(6) - k_matrix @ self.h_matrix) @ self.p_matrix
 
     def predict(self, steps_ahead=1):
         """Predict target position ahead by steps_ahead time steps.
@@ -66,6 +66,6 @@ class KalmanTargetTracker:
         Returns:
             Predicted position as [x, y, z] list.
         """
-        F_ahead = np.linalg.matrix_power(self.F, steps_ahead)
-        pred = F_ahead @ self.x
+        f_ahead = np.linalg.matrix_power(self.f_matrix, steps_ahead)  # pylint: disable=invalid-name
+        pred = f_ahead @ self.x
         return pred[:3].flatten().tolist()
