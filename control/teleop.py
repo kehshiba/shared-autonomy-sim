@@ -6,7 +6,7 @@ from control.latency import LatencyBuffer
 from control.assist import assist_command
 from control.intent import IntentEstimator
 
-def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
+def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3):
     """
     Control Panda end-effector with keyboard
     """
@@ -15,6 +15,8 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
 
     latency_buf = LatencyBuffer(delay_seconds = delay)
     intent_estimator = IntentEstimator(window=6)
+
+    target_pos_sim = p.getBasePositionAndOrientation(target_id)[0]
 
     active_command = None  # Last released delayed command
 
@@ -68,9 +70,13 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
             assisted_pos = assist_command(
                 active_cmd=target_pos,
                 delayed_cmd=predicted_pos,
-                alpha=0.6
+                target_pos=target_pos_sim,
+                alpha=0.6,
+                beta=0.3
             )
             print(f"[Assist] Target: {target_pos}, Assisted: {assisted_pos}")
+            p.addUserDebugLine(target_pos, assisted_pos, [0,0,1], 2, 0.1)  # blue line
+            p.addUserDebugLine(assisted_pos, target_pos_sim, [1,0,0], 2, 0.1)      # red line
 
             joint_angles = calculate_ik(robot_id, assisted_pos, ee_link_index)
             for i, angle in enumerate(joint_angles):
@@ -80,6 +86,6 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
                     controlMode=p.POSITION_CONTROL,
                     targetPosition=angle
                 )
-       
+    
         p.stepSimulation()
         time.sleep(1./240.)

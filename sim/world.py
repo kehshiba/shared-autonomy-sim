@@ -7,3 +7,18 @@ def create_world():
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     plane_id = p.loadURDF("plane.urdf")
     return physicsClient, plane_id
+
+def create_target():
+    # Create a target sphere
+    target_visual = p.createVisualShape(shapeType=p.GEOM_SPHERE,
+                                        radius=0.05,
+                                        rgbaColor=[1,0,0,1])
+    target_collision = p.createCollisionShape(shapeType=p.GEOM_SPHERE,
+                                              radius=0.05)
+    target_pos = [0.5, 0.2, 0.5]  # example target
+    target_id = p.createMultiBody(baseMass=0,
+                                  baseCollisionShapeIndex=target_collision,
+                                  baseVisualShapeIndex=target_visual,
+                                  basePosition=target_pos)
+    
+    return target_id
