@@ -1,5 +1,7 @@
-import pybullet as p
+"""Teleop Module"""
+
 import time
+import pybullet as p
 from kinematics.ik import calculate_ik
 from kinematics.fk import get_end_effector_pose
 from control.latency import LatencyBuffer
@@ -11,14 +13,12 @@ def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3)
     """
     Control Panda end-effector with keyboard
     """
-    pos, ori = get_end_effector_pose(robot_id)
+    pos, _ = get_end_effector_pose(robot_id)
     target_pos = list(pos)  # [x, y, z]
 
-    latency_buf = LatencyBuffer(delay_seconds = delay)
+    latency_buf = LatencyBuffer(delay_seconds=delay)
     intent_estimator = IntentEstimator(window=6)
     world_model = KalmanTargetTracker(dt=1./240.)
-
-    target_pos_sim = p.getBasePositionAndOrientation(target_id)[0]
 
     active_command = None  # Last released delayed command
 
@@ -31,17 +31,23 @@ def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3)
         moved = False
 
         if ord('w') in keys:
-            target_pos[1] += step_size; moved = True
+            target_pos[1] += step_size
+            moved = True
         if ord('s') in keys:
-            target_pos[1] -= step_size; moved = True
+            target_pos[1] -= step_size
+            moved = True
         if ord('a') in keys:
-            target_pos[0] -= step_size; moved = True
+            target_pos[0] -= step_size
+            moved = True
         if ord('d') in keys:
-            target_pos[0] += step_size; moved = True
+            target_pos[0] += step_size
+            moved = True
         if ord('q') in keys:
-            target_pos[2] += step_size; moved = True
+            target_pos[2] += step_size
+            moved = True
         if ord('e') in keys:
-            target_pos[2] -= step_size; moved = True
+            target_pos[2] -= step_size
+            moved = True
         if 27 in keys:  # ESC
             print("Exiting teleop")
             break
@@ -56,9 +62,9 @@ def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3)
         # Represents that a command arrived from network
         if delayed_command is not None:
             active_command = delayed_command
-            print("[Latency] Released new command",time.time())
+            print("[Latency] Released new command", time.time())
         # Intent estimation
-    
+
         intent = intent_estimator.estimate()
 
         # Predicted future position

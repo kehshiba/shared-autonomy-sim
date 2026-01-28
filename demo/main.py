@@ -1,11 +1,9 @@
-import time
-import pybullet as p
-import pybullet_data
+"""
+Robot Teleoperation Demo for Latency and Shared Autonomy
+"""
 
 from sim.world import create_world , create_target
 from sim.robot_loader import load_robot 
-from kinematics.fk import get_end_effector_pose
-from kinematics.ik import calculate_ik
 from control.teleop import teleop_robot
 
 if __name__ == "__main__":

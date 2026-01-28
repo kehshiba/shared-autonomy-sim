@@ -1,14 +1,18 @@
+""" World Creation Module """
+
 import pybullet as p
 import pybullet_data
 
 def create_world():
-    physicsClient = p.connect(p.GUI)
+    """ Sets up the simulation world with a plane and gravity """
+    physics_client = p.connect(p.GUI)
     p.setGravity(0,0,-9.81)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     plane_id = p.loadURDF("plane.urdf")
-    return physicsClient, plane_id
+    return physics_client, plane_id
 
 def create_target():
+    """ Creates a target object in the simulation """
     # Create a target sphere
     target_visual = p.createVisualShape(shapeType=p.GEOM_SPHERE,
                                         radius=0.05,

@@ -1,3 +1,5 @@
+""" Assist Module """
+
 import numpy as np
 
 def assist_command(active_cmd, delayed_cmd, target_pos=None,alpha=0.6, beta=0/3):

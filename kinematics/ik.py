@@ -1,4 +1,4 @@
-# kinematics/ik.py
+""" Inverse Kinematics Module """
 import pybullet as p
 
 def calculate_ik(robot_id, target_pos, ee_link_index=11):

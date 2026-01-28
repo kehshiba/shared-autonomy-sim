@@ -1,3 +1,4 @@
+""" Intent Estimation Module """
 from collections import deque
 import numpy as np
 
