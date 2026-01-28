@@ -1,7 +1,16 @@
+"""World model module for Kalman filtering target tracking."""
+
 import numpy as np
 
 class KalmanTargetTracker:
+    """Kalman filter for tracking target position and velocity."""
+
     def __init__(self, dt=1./240.):
+        """Initialize Kalman tracker with state and covariance matrices.
+
+        Args:
+            dt: Time step for simulation (default 1/240 seconds).
+        """
         # State vector: [x, y, z, vx, vy, vz]
         self.dt = dt
         self.x = np.zeros((6, 1))  # initial state
@@ -29,6 +38,11 @@ class KalmanTargetTracker:
         self.R = np.eye(3) * 0.01   # measurement noise
 
     def update(self, measurement):
+        """Update state estimate with new position measurement.
+
+        Args:
+            measurement: Position measurement [x, y, z].
+        """
         z = np.array(measurement).reshape(3,1)
 
         # Prediction step
@@ -44,6 +58,14 @@ class KalmanTargetTracker:
         self.P = (np.eye(6) - K @ self.H) @ self.P
 
     def predict(self, steps_ahead=1):
+        """Predict target position ahead by steps_ahead time steps.
+
+        Args:
+            steps_ahead: Number of time steps to predict ahead (default 1).
+
+        Returns:
+            Predicted position as [x, y, z] list.
+        """
         F_ahead = np.linalg.matrix_power(self.F, steps_ahead)
         pred = F_ahead @ self.x
         return pred[:3].flatten().tolist()
