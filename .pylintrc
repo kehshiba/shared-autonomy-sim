@@ -1,2 +1,9 @@
 [MASTER]
 extension-pkg-allow-list=pybullet,pybullet_data,numpy
+[DESIGN]
+max-locals=25
+max-branches=15
+max-statements=60
+
+[MESSAGES CONTROL]
+disable=import-error
