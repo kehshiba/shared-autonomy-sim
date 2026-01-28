@@ -3,6 +3,7 @@ import time
 from kinematics.ik import calculate_ik
 from kinematics.fk import get_end_effector_pose
 from control.latency import LatencyBuffer
+from control.assist import assist_command
 
 def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
     """
@@ -17,6 +18,8 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
     print("Use W/S: +Y/-Y, A/D: -X/+X, Q/E: +Z/-Z, ESC to quit")    
 
     while True:
+        p.configureDebugVisualizer(p.COV_ENABLE_WIREFRAME, 0)
+
         keys = p.getKeyboardEvents()
         moved = False
 
@@ -51,7 +54,12 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
         # Represents what the robot will do , ideating for a message broker system
         # Apply latest released delayed command continuously
         if active_command is not None:
-            joint_angles = calculate_ik(robot_id, active_command, ee_link_index)
+            assisted_pos = assist_command(
+                active_cmd=target_pos,
+                delayed_cmd=active_command,
+                alpha=0.6
+                )
+            joint_angles = calculate_ik(robot_id, assisted_pos, ee_link_index)
             for i, angle in enumerate(joint_angles):
                 p.setJointMotorControl2(
                     bodyUniqueId=robot_id,
