@@ -24,5 +24,5 @@ def create_target():
                                   baseCollisionShapeIndex=target_collision,
                                   baseVisualShapeIndex=target_visual,
                                   basePosition=target_pos)
-    
+
     return target_id

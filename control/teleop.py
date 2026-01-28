@@ -9,7 +9,7 @@ from control.assist import assist_command
 from control.intent import IntentEstimator
 from control.world_model import KalmanTargetTracker
 
-def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3):
+def teleop_robot(robot_id, target_id, ee_link_index=11, step_size=0.05, delay=0.3):  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
     """
     Control Panda end-effector with keyboard
     """
@@ -22,7 +22,7 @@ def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3)
 
     active_command = None  # Last released delayed command
 
-    print("Use W/S: +Y/-Y, A/D: -X/+X, Q/E: +Z/-Z, ESC to quit")    
+    print("Use W/S: +Y/-Y, A/D: -X/+X, Q/E: +Z/-Z, ESC to quit")
 
     while True:
         p.configureDebugVisualizer(p.COV_ENABLE_WIREFRAME, 0)
@@ -111,6 +111,6 @@ def teleop_robot(robot_id, target_id, ee_link_index=11,step_size=0.05,delay=0.3)
                     controlMode=p.POSITION_CONTROL,
                     targetPosition=angle
                 )
-    
+
         p.stepSimulation()
         time.sleep(1./240.)

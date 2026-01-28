@@ -7,9 +7,9 @@ class IntentEstimator:
     Estimates user intent based on recent end-effector positions
     """
 
-    def __init__(self,window=6):
+    def __init__(self, window=6):
         self.history = deque(maxlen=window)
-    
+
     def add(self, pos):
         """
         Add a new human command position
@@ -21,8 +21,8 @@ class IntentEstimator:
         Estimate intent as direction of motion
         """
         if len(self.history) < 2:
-             return None
-         
+            return None
+
         start = self.history[0]
         end = self.history[-1]
 
