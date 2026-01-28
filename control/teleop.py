@@ -6,7 +6,7 @@ from control.latency import LatencyBuffer
 from control.assist import assist_command
 from control.intent import IntentEstimator
 
-def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=3.0):
+def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=0.3):
     """
     Control Panda end-effector with keyboard
     """
@@ -53,25 +53,25 @@ def teleop_robot(robot_id, ee_link_index=11,step_size=0.02,delay=3.0):
         if delayed_command is not None:
             active_command = delayed_command
             print("[Latency] Released new command",time.time())
+        # Intent estimation
+    
+        intent = intent_estimator.estimate()
 
+        # Predicted future position
+        predicted_pos = list(active_command) if active_command is not None else list(target_pos)
+        if intent is not None and active_command is not None:
+            predicted_pos = list(active_command + 0.5 * intent)
+            print(f"[Prediction] Predicted future pos: {predicted_pos}")
 
-        # Represents what the robot will do , ideating for a message broker system
-        # Apply latest released delayed command continuously
+        # Blend human and predicted
         if active_command is not None:
-            intent = intent_estimator.estimate()
-
-            predicted_pos = list(active_command)
-
-            if intent is not None:
-                predicted_pos = list(
-                    active_command + 0.5 * intent
-                )
-
             assisted_pos = assist_command(
                 active_cmd=target_pos,
                 delayed_cmd=predicted_pos,
                 alpha=0.6
-                )
+            )
+            print(f"[Assist] Target: {target_pos}, Assisted: {assisted_pos}")
+
             joint_angles = calculate_ik(robot_id, assisted_pos, ee_link_index)
             for i, angle in enumerate(joint_angles):
                 p.setJointMotorControl2(
